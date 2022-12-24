@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build base=/rnAndroid",
+    "build": "vite build --base=/rnAndroid",
     "preview": "vite preview"
   },
   "dependencies": {
