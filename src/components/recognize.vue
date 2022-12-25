@@ -5,8 +5,7 @@
     <div style="margin-top: 2vh; color: red">
       {{ fileName ? "已上传：" + fileName : "" }}
     </div>
-    <div>{{ res }}</div>
-    <form ref="formRef">
+    <form ref="formRef" enctype="multipart/form-data">
       <button type="submit" class="btn btnLeft">开始识别</button>
       <input
         type="file"
@@ -17,49 +16,63 @@
       />
     </form>
     <div class="btn btnRight" @click="againFunc">再来一次</div>
+    <img v-if="imgUrl" :src="imgUrl" class="imgC" />
+    <div
+      v-if="isShow"
+      style="width: 100%; height: 1px; background: black; margin-bottom: 2vh"
+    ></div>
+    <div v-if="isShow" style="color: red; font-weight: 600">识别结果</div>
     <div class="show" v-if="isShow" style="color: gray">
-      {{ result }}
+      {{ recognizeRes }}
     </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
-import axios from "axios";
+import Tesseract from "tesseract.js";
+
+const recognizeRes = ref("");
+
+async function recognizeText(base64Image) {
+  // 在图像上执行 OCR
+  Tesseract.recognize(base64Image, "eng", {
+    logger: (m) => {},
+    // logger: (m) => console.log(m),
+  }).then(({ data: { text } }) => {
+    console.log(text);
+    recognizeRes.value = text;
+  });
+}
 
 const emits = defineEmits(["someEvent"]);
 
+const imgUrl = ref("");
+
 const fileName = ref("");
-const res = ref("");
 const dealFile = (e) => {
   fileName.value = e.target.files[0].name;
-  console.log(e.target.files[0]);
+
+  const reader = new FileReader();
+  // 读取完毕后获取结果
+  reader.onload = (event) => {
+    imgUrl.value = event.target.result;
+  };
+  // 把文件对象作为一个 dataURL 读入
+  reader.readAsDataURL(e.target.files[0]);
 };
 
 const formRef = ref(null);
 onMounted(() => {
-  formRef.value.addEventListener("submit", (event) => {
+  formRef.value.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const formData = new FormData(formRef.value);
-
-    // console.log(formData, formRef.value);
-    axios
-      .post("/my/image-recognize", formData, { timeout: 10000 })
-      .then((response) => {
-        // handle success
-        console.log(response.data);
-      })
-      .catch((error) => {
-        // handle error
-      });
-
+    await recognizeText(imgUrl.value);
     isShow.value = true;
   });
 });
 
 const isShow = ref(false);
-const result = "12574756382";
 
 const againFunc = () => {
   isShow.value = false;
@@ -115,6 +128,13 @@ const againFunc = () => {
     height: 9vh;
     top: -9vh;
     opacity: 0;
+  }
+  .imgC {
+    display: block;
+    width: 100%;
+  }
+  .show {
+    margin-top: 2vh;
   }
 }
 </style>
