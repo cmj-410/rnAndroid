@@ -3,8 +3,8 @@
     <div class="cardWrapper">
       <div class="card" @click="myfunc">图像识别</div>
       <div class="card" @click="toChat">智能机器人</div>
-      <div class="card">卡片a</div>
-      <div class="card">卡片a</div>
+      <div class="card" @click="toTranslate">翻译</div>
+      <div class="card" @click="getweather">查询天气</div>
     </div>
   </div>
   <recognize v-if="isshow" @someEvent="isshow = false" />
@@ -21,6 +21,14 @@ const myfunc = function (e) {
 };
 const toChat = () => {
   router.push("/chat");
+};
+
+const toTranslate = () => {
+  router.push("/translate");
+};
+
+const getweather = () => {
+  router.push("/weather");
 };
 </script>
 

@@ -8,7 +8,8 @@
         :key="item.value"
         :class="{ right: item.type == 1, tagclass: true }"
       >
-        {{ item.value }}
+        <div>{{ item.time }}</div>
+        <div>{{ item.value }}</div>
       </div>
     </div>
     <div class="inputArea">
@@ -38,15 +39,39 @@ const msgList = ref([]);
 const sendmsg = async () => {
   msgList.value.push({
     type: 1,
+    time: getTime(),
     value: inputmsg.value,
   });
   const res = await apiChat(inputmsg.value);
   inputmsg.value = "";
+
   msgList.value.push({
     type: 0,
+    time: getTime(),
     value: res.data.choices[0].text,
   });
 };
+
+function getTime() {
+  const temp = new Date();
+  const hour = temp.getHours();
+  const minute = temp.getMinutes();
+  let timeCur = "";
+  if (hour >= 6 && hour <= 12) {
+    timeCur += "上午";
+  } else {
+    if (hour > 12 && hour <= 18) {
+      timeCur += "下午";
+    } else {
+      if (hour > 18 && hour <= 22) {
+        timeCur += "晚上";
+      } else {
+        timeCur += "凌晨";
+      }
+    }
+  }
+  return (timeCur += hour + ":" + minute);
+}
 </script>
 
 <style lang="scss" scoped>

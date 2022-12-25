@@ -19,6 +19,16 @@ const routes = [
           import(/* webpackChunkName: "chatPage" */ "../views/Chat.vue"),
       },
       {
+        path: "/weather",
+        component: () =>
+          import(/* webpackChunkName: "weather" */ "../views/Weather.vue"),
+      },
+      {
+        path: "/translate",
+        component: () =>
+          import(/* webpackChunkName: "translate" */ "../views/Translate.vue"),
+      },
+      {
         path: "/speakHome",
         component: () =>
           import(/* webpackChunkName: "speakHome" */ "../views/speakHome.vue"),

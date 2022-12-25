@@ -77,6 +77,7 @@ const isShow = ref(false);
 const againFunc = () => {
   isShow.value = false;
   fileName.value = "";
+  imgUrl.value = "";
 };
 </script>
 
