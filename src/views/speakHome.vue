@@ -5,7 +5,10 @@
       :key="item.title"
       :title="item.title"
       :author="item.author"
-      :time="item.time"
+      :time="
+        item.lastUpdateTime.split('T')[0] +
+        item.lastUpdateTime.split('T')[1].split('.')[0]
+      "
       :content="item.content"
     />
     <div class="yuan" @click="newSpeak">+</div>
@@ -18,30 +21,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import SpeakCard from "../components/speakCard.vue";
 import SpeakModal from "../components/speakModal.vue";
+import { useRoute } from "vue-router";
+import axios from "axios";
 
-const theList = ref([
-  {
-    title: "一个标题",
-    author: "佚名",
-    time: "12月21日18点34分",
-    content: "一些作为文章主体的内容",
-  },
-  {
-    title: "西游记好好看",
-    author: "大唐皇帝",
-    time: "12月20日16点22分",
-    content: "哪里可以要到女儿国王的联系方式？",
-  },
-  {
-    title: "疫情啥时候结束呀",
-    author: "佚名",
-    time: "12月19日11点31分",
-    content: "放开了的状况下，疫情啥时候才能结束呢？",
-  },
-]);
+const theList = ref([]);
+const routes = useRoute();
+onMounted(() => {
+  setInterval(getList, 3000);
+});
+
+const getList = async () => {
+  if (routes.fullPath == "/speakHome") {
+    const res = await axios.get("/my/speaks-list");
+    theList.value = res.data.data.list;
+  }
+};
+getList();
 
 const isShow = ref(false);
 
@@ -49,8 +47,8 @@ const newSpeak = () => {
   isShow.value = true;
 };
 
-const dealSubmit = (data) => {
-  theList.value.push(data);
+const dealSubmit = async (data) => {
+  await axios.post("/my/speaks-add", data);
 };
 </script>
 
