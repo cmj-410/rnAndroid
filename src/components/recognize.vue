@@ -3,7 +3,7 @@
   <div class="content">
     <div class="dotbox">点击上传图片</div>
     <div style="margin-top: 2vh; color: red">
-      {{ fileName ? "已上传：" + fileName : "" }}
+      {{ updone && fileName ? "已上传：" + fileName : "" }}
     </div>
     <form ref="formRef" enctype="multipart/form-data">
       <button type="submit" class="btn btnLeft">开始识别</button>
@@ -23,7 +23,7 @@
     ></div>
     <div v-if="isShow" style="color: red; font-weight: 600">识别结果</div>
     <div class="show" v-if="isShow" style="color: gray">
-      {{ recognizeRes }}
+      {{ recognizeRes == "" ? "等待识别结果..." : recognizeRes }}
     </div>
   </div>
 </template>
@@ -49,14 +49,25 @@ const emits = defineEmits(["someEvent"]);
 
 const imgUrl = ref("");
 
+// 图片是否上传成功
+const updone = ref(false);
+
 const fileName = ref("");
 const dealFile = (e) => {
+  // 先清空之前的结果
+  recognizeRes.value = "";
+  // 关闭结果的显示
+  isShow.value = false;
+  // 图片上传状态初始化
+  updone.value = false;
+
   fileName.value = e.target.files[0].name;
 
   const reader = new FileReader();
   // 读取完毕后获取结果
   reader.onload = (event) => {
     imgUrl.value = event.target.result;
+    updone.value = true;
   };
   // 把文件对象作为一个 dataURL 读入
   reader.readAsDataURL(e.target.files[0]);
@@ -67,6 +78,9 @@ onMounted(() => {
   formRef.value.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    if (!imgUrl.value) {
+      return;
+    }
     await recognizeText(imgUrl.value);
     isShow.value = true;
   });
@@ -78,6 +92,8 @@ const againFunc = () => {
   isShow.value = false;
   fileName.value = "";
   imgUrl.value = "";
+  recognizeRes.value = "";
+  updone.value = false;
 };
 </script>
 
