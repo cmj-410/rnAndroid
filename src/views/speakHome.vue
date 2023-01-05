@@ -7,6 +7,7 @@
       :author="item.author"
       :time="
         item.lastUpdateTime.split('T')[0] +
+        ' ' +
         item.lastUpdateTime.split('T')[1].split('.')[0]
       "
       :content="item.content"
